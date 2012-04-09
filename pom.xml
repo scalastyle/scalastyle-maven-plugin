@@ -1,0 +1,164 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.sss.scala-tools</groupId>
+    <artifactId>scalastyle-maven-plugin</artifactId>
+    <packaging>maven-plugin</packaging>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>Scalastyle Maven Plugin</name>
+    <description>Integrates Scalastyle style checker for Scala with maven</description>
+    <url></url>
+    <inceptionYear>2012</inceptionYear>
+
+    <prerequisites>
+        <maven>${maven.version}</maven>
+    </prerequisites>
+
+    <properties>
+        <maven.version>3.0</maven.version>
+        <maven.compiler.source>1.5</maven.compiler.source>
+        <maven.compiler.target>1.5</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <scala.version>2.9.1</scala.version>
+        <junit.version>4.10</junit.version>
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.scalastyle</groupId>
+            <artifactId>scalastyle_${scala.version}</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>${scala.version}</version>
+        </dependency>
+
+        <!-- maven -->
+        <dependency>
+            <groupId>org.scala-tools</groupId>
+            <artifactId>scala-mojo-support</artifactId>
+            <version>0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
+            <version>${maven.version}</version>
+        </dependency>
+        <!--dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-core</artifactId>
+            <version>${maven.version}</version>
+        </dependency-->
+
+        <!-- test -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <releases>
+                <enabled>false</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+            <snapshots>
+                <updatePolicy>never</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+            <id>scala-tools-snapshots</id>
+            <name>scala-tools-snapshots</name>
+            <url>http://scala-tools.org/repo-snapshots/</url>
+        </repository>
+        <repository>
+            <releases>
+                <enabled>false</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+            <snapshots>
+                <updatePolicy>never</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+            <id>repo1</id>
+            <name>repo1</name>
+            <url>http://repo1.maven.org/maven2</url>
+        </repository>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>scala-tools</id>
+            <name>Scala Tools</name>
+            <url>http://scala-tools.org/repo-releases/</url>
+        </repository>
+    </repositories>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.scala-tools</groupId>
+                <artifactId>maven-scala-plugin</artifactId>
+                <version>2.15.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>add-source</goal>
+                            <goal>compile</goal>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <scalaVersion>${scala.version}</scalaVersion>
+                    <args>
+                        <arg>-unchecked</arg>
+                        <arg>-deprecation</arg>
+                        <arg>-explaintypes</arg>
+                    </args>
+                    <sourceDir>src/main/scala</sourceDir>
+                    <testSourceDir>src/test/scala</testSourceDir>
+                    <jvmArgs>
+                        <jvmArg>-Xms64m</jvmArg>
+                        <jvmArg>-Xmx1024m</jvmArg>
+                    </jvmArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-plugin-plugin</artifactId>
+                <version>2.9</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.scala-tools</groupId>
+                        <artifactId>scala-mojo-support</artifactId>
+                        <version>0.3</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.1.2</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
