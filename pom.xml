@@ -1,7 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>org.sss.scala-tools</groupId>
     <artifactId>scalastyle-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
@@ -42,18 +41,13 @@
         <dependency>
             <groupId>org.scala-tools</groupId>
             <artifactId>scala-mojo-support</artifactId>
-            <version>0.3</version>
+            <version>0.4-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
             <version>${maven.version}</version>
         </dependency>
-        <!--dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-core</artifactId>
-            <version>${maven.version}</version>
-        </dependency-->
 
         <!-- test -->
         <dependency>

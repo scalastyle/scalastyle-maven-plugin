@@ -78,7 +78,7 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
    */
   @parameter
   @expression("${scalastyle.verbose}")
-  var verbose: Boolean = true
+  var verbose: Boolean = false
 
 
   /**
@@ -109,7 +109,7 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
    */
   @parameter
   @expression("${scalastyle.includeTestSourceDirectory}")
-  var includeTestSourceDirectory: Boolean = true
+  var includeTestSourceDirectory: Boolean = false
 
   /**
    * Directory containing the build files.
@@ -151,12 +151,12 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
 
       val violations = outputResult.errors + (if (failsOnWarning) outputResult.warnings else 0)
 
-      if (failOnViolation && violations > 0 ) {
+      if (failOnViolation && violations > 0) {
         val msg = "You have " + violations + " Scalastyle violation" + (if (violations > 1) "s" else "") + ".";
         throw new MojoFailureException(msg);
       }
-
-      getLog.warn("Scalastyle:check violations detected but failOnViolation set to "+ failOnViolation);
+      if (violations > 0)
+        getLog.warn("Scalastyle:check violations detected but failOnViolation set to " + failOnViolation);
 
     } catch {
       case e: Exception => throw new MojoExecutionException("Failed during scalastyle execution", e);
