@@ -1,5 +1,5 @@
-## scalastyle-maven-plugin 
-Welcome to the scalastyle-maven-plugin wiki!
+## maven-scalastyle-plugin
+Welcome to the maven-scalastyle-plugin wiki!
 This project is intended to provide maven plugin support  for Scalastyle.
 For more information about Scalastyle, see [https://github.com/scalastyle/scalastyle](https://github.com/scalastyle/scalastyle)
 
@@ -8,15 +8,18 @@ For more information about Scalastyle, see [https://github.com/scalastyle/scalas
 
 ## Usage
 ### Check scalacheck violation part of build cycle
-To Configure the Scalastyle Plugin, you need to the add it in the <build> section of your pom.xml as shown in the sample below. Default phase of execution is `process-sources` and build will fail if there any voilation
+To Configure the Scalastyle Plugin, you need to the add it in the <build> section of your pom.xml as shown in the sample below,
+and by default the build will fail if there are any violations of level error found.
+Default phase of execution is `process-sources` and build will fail if there any violations. However, the recommended phase of execution is verify,
+because the checks are not correctly performed if the code does not compile.
  
       <build>
          <plugins> 
           ...
             <plugin>
-                <groupId>org.sss.scala-tools</groupId>
+                <groupId>org.scalastyle</groupId>
                 <artifactId>scalastyle-maven-plugin</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>0.1.0-SNAPSHOT</version>
                 <configuration>
                     <verbose>true</verbose>
                     <failOnViolation>true</failOnViolation>

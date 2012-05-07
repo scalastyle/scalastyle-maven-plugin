@@ -1,4 +1,4 @@
-package org.sss.scalatools.scalastyle.plugin
+package org.scalastyle.maven.plugin
 
 import java.io.File
 import collection.mutable.ListBuffer
@@ -42,7 +42,7 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
    */
   @parameter
   @expression("${scalastyle.failOnViolation}")
-  var failOnViolation: Boolean = true
+  var failOnViolation: java.lang.Boolean = true
 
   /**
    * Specifies if the build should fail upon a warning level violation.
@@ -51,7 +51,7 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
    */
   @parameter
   @expression("${scalastyle.failsOnWarning}")
-  var failsOnWarning: Boolean = false
+  var failsOnWarning: java.lang.Boolean = false
 
   /**
    * skip the entire goal
@@ -60,7 +60,7 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
    */
   @parameter
   @expression("${scalastyle.skip}")
-  var skip: Boolean = false
+  var skip: java.lang.Boolean = false
 
   /**
    * Whether to build an aggregated report at the root, or build individual reports.
@@ -69,7 +69,7 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
    */
   @parameter
   @expression("${aggregate}")
-  var aggregate: Boolean = false
+  var aggregate: java.lang.Boolean = false
 
   /**
    * Print details of check failures to build output.
@@ -78,7 +78,7 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
    */
   @parameter
   @expression("${scalastyle.verbose}")
-  var verbose: Boolean = false
+  var verbose: java.lang.Boolean = false
 
 
   /**
@@ -109,7 +109,7 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
    */
   @parameter
   @expression("${scalastyle.includeTestSourceDirectory}")
-  var includeTestSourceDirectory: Boolean = false
+  var includeTestSourceDirectory: java.lang.Boolean = false
 
   /**
    * Directory containing the build files.
@@ -164,27 +164,29 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
 
   }
 
-  def getConfigFile: String = {
-    if (configLocation == null)
-      throw new MojoFailureException("configLocation is required");
-    if (!new File(configLocation).exists())
-      throw new MojoFailureException("configLocation " + configLocation + " does not exists");
+  private[this] def getConfigFile: String = {
+    if (configLocation == null) {
+      throw new MojoFailureException("configLocation is required")
+	}
+	
+    if (!new File(configLocation).exists()) {
+      throw new MojoFailureException("configLocation " + configLocation + " does not exists")
+	}
 
-    configLocation;
+    configLocation
   }
 
-
-  def getFilesToProcess: List[FileSpec] = {
+  private[this] def getFilesToProcess: List[FileSpec] = {
     val specs = ListBuffer[FileSpec]()
 
-    if (sourceDirectory != null && sourceDirectory.exists() && testSourceDirectory.isDirectory()) {
+    if (sourceDirectory != null && sourceDirectory.exists() && sourceDirectory.isDirectory()) {
       specs.appendAll(Directory.getFiles(sourceDirectory));
     }
 
-    if (includeTestSourceDirectory && testSourceDirectory != null
-      && testSourceDirectory.exists() && testSourceDirectory.isDirectory()) {
+    if (includeTestSourceDirectory && testSourceDirectory != null && testSourceDirectory.exists() && testSourceDirectory.isDirectory()) {
       specs.appendAll(Directory.getFiles(testSourceDirectory));
     }
+	
     specs.toList
   }
 
