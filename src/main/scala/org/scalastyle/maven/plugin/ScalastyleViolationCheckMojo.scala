@@ -1,3 +1,19 @@
+// Copyright (C) 2011-2012 the original author or authors.
+// See the LICENCE.txt file distributed with this work for additional
+// information regarding copyright ownership.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package org.scalastyle.maven.plugin
 
 import java.io.File
@@ -5,24 +21,24 @@ import collection.mutable.ListBuffer
 import org.scalastyle._
 import org.apache.maven.plugin.{MojoExecutionException, MojoFailureException, AbstractMojo}
 import org.scala_tools.maven.mojo.annotations._
+import java.util.Date
 
 /**
  * Entry point for scalastyle maven plugin.
  */
 @description("Integrates Scalastyle style checker for Scala with maven")
 @goal("check")
-@phase("process-sources")
+@phase("verify")
 @requiresProject
 class ScalastyleViolationCheckMojo extends AbstractMojo {
-
   /**
    * Specifies the configuration file location
    *
-   * @parameter expression="${scalastyle.config.file}"
+   * @parameter expression="${scalastyle.config.location}"
    * @required
    */
   @parameter
-  @expression("${scalastyle.config.file}")
+  @expression("${scalastyle.config.location}")
   @required
   var configLocation: String = _
 
@@ -38,7 +54,8 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
   /**
    * Whether to fail the build if the validation check fails.
    *
-   * @parameter expression="${scalastyle.failOnViolation}"  default-value="true"
+   * @parameter expression="${scalastyle.failOnViolation}"
+   *            default-value="true"
    */
   @parameter
   @expression("${scalastyle.failOnViolation}")
@@ -47,11 +64,11 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
   /**
    * Specifies if the build should fail upon a warning level violation.
    *
-   * @parameter expression="${scalastyle.failsOnWarning}" default-value="false"
+   * @parameter expression="${scalastyle.failOnWarning}" default-value="false"
    */
   @parameter
-  @expression("${scalastyle.failsOnWarning}")
-  var failsOnWarning: java.lang.Boolean = false
+  @expression("${scalastyle.failOnWarning}")
+  var failOnWarning: java.lang.Boolean = false
 
   /**
    * skip the entire goal
@@ -63,16 +80,7 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
   var skip: java.lang.Boolean = false
 
   /**
-   * Whether to build an aggregated report at the root, or build individual reports.
-   *
-   * @parameter expression="${aggregate}" default-value="false"
-   */
-  @parameter
-  @expression("${aggregate}")
-  var aggregate: java.lang.Boolean = false
-
-  /**
-   * Print details of check failures to build output.
+   * Print details of everything that Scalastyle is doing
    *
    * @parameter expression="${scalastyle.verbose}" default-value="false"
    */
@@ -80,6 +88,14 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
   @expression("${scalastyle.verbose}")
   var verbose: java.lang.Boolean = false
 
+  /**
+   * Print very little.
+   *
+   * @parameter expression="${scalastyle.quiet}" default-value="false"
+   */
+  @parameter
+  @expression("${scalastyle.quiet}")
+  var quiet: java.lang.Boolean = false
 
   /**
    * Specifies the location of the scala source directory to be used for Scalastyle.
@@ -103,7 +119,7 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
   var testSourceDirectory: File = _
 
   /**
-   * Include or not the test source directory to be used for Scalastyle.
+   * Include or not the test source directory in the Scalastyle checks.
    *
    * @parameter default-value="${false}"
    */
@@ -136,58 +152,71 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
   def execute() {
     if (skip) {
       getLog.debug("Scalastyle:check is skipped as it is turned on")
-      return;
+    } else {
+      performCheck()
     }
+  }
 
-    val configuration = ScalastyleConfiguration.readFromXml(getConfigFile)
+  private[this] def performCheck() {
+    checkConfigFile(configLocation)
     try {
+      val configuration = ScalastyleConfiguration.readFromXml(configLocation)
+      val start = now()
       val messages = new ScalastyleChecker[FileSpec].checkFiles(configuration, getFilesToProcess)
 
-      val outputResult = new TextOutput[FileSpec](verbose, !verbose).output(messages)
+      val outputResult = new TextOutput[FileSpec](verbose, quiet).output(messages)
 
-      if (verbose) println("Processed " + outputResult.files + " file(s)")
-      if (verbose) println("Found " + outputResult.errors + " errors")
-      if (verbose) println("Found " + outputResult.warnings + " warnings")
+      // scalastyle:off regex
+      if (!quiet) println("Processed " + outputResult.files + " file(s)")
+      if (!quiet) println("Found " + outputResult.errors + " errors")
+      if (!quiet) println("Found " + outputResult.warnings + " warnings")
+      if (!quiet) println("Finished in " + (now - start) + " ms")
+      // scalastyle:on regex
 
-      val violations = outputResult.errors + (if (failsOnWarning) outputResult.warnings else 0)
+      val violations = outputResult.errors + (if (failOnWarning) outputResult.warnings else 0)
 
-      if (failOnViolation && violations > 0) {
-        val msg = "You have " + violations + " Scalastyle violation" + (if (violations > 1) "s" else "") + ".";
-        throw new MojoFailureException(msg);
+      if (violations > 0) {
+        if (failOnViolation) {
+          throw new MojoFailureException("You have " + violations + " Scalastyle violation(s).")
+        } else {
+          getLog.warn("Scalastyle:check violations detected but failOnViolation set to " + failOnViolation)
+        }
+      } else {
+        getLog.debug("Scalastyle:check no violations found")
       }
-      if (violations > 0)
-        getLog.warn("Scalastyle:check violations detected but failOnViolation set to " + failOnViolation);
-
     } catch {
       case e: Exception => throw new MojoExecutionException("Failed during scalastyle execution", e);
     }
-
   }
 
-  private[this] def getConfigFile: String = {
+  private[this] def now(): Long = new Date().getTime()
+
+  private[this] def checkConfigFile(configLocation: String): Unit = {
     if (configLocation == null) {
       throw new MojoFailureException("configLocation is required")
-	}
-	
-    if (!new File(configLocation).exists()) {
-      throw new MojoFailureException("configLocation " + configLocation + " does not exists")
-	}
+    }
 
-    configLocation
+    if (!new File(configLocation).exists()) {
+      throw new MojoFailureException("configLocation " + configLocation + " does not exist")
+    }
   }
 
   private[this] def getFilesToProcess: List[FileSpec] = {
-    val specs = ListBuffer[FileSpec]()
+    val sd = getFiles("sourceDirectory", sourceDirectory)
+    val tsd = if (includeTestSourceDirectory) getFiles("testSourceDirectory", testSourceDirectory) else Nil
 
-    if (sourceDirectory != null && sourceDirectory.exists() && sourceDirectory.isDirectory()) {
-      specs.appendAll(Directory.getFiles(sourceDirectory));
-    }
-
-    if (includeTestSourceDirectory && testSourceDirectory != null && testSourceDirectory.exists() && testSourceDirectory.isDirectory()) {
-      specs.appendAll(Directory.getFiles(testSourceDirectory));
-    }
-	
-    specs.toList
+    sd ::: tsd
   }
 
+  private[this] def getFiles(name: String, file: File) = {
+    if (isDirectory(file)) {
+      getLog.debug("processing " + name + "=" + file)
+      Directory.getFiles(file)
+    } else {
+      getLog.warn(name + " is not specified or does not exist value=" + file)
+      Nil
+    }
+  }
+
+  private[this] def isDirectory(file: File) = file != null && file.exists() && file.isDirectory()
 }
