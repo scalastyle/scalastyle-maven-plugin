@@ -1,13 +1,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+   <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
   <groupId>org.scalastyle</groupId>
   <artifactId>scalastyle-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <version>0.1.0-SNAPSHOT</version>
   <name>Scalastyle Maven Plugin</name>
   <description>Integrates Scalastyle style checker for Scala with maven</description>
-  <url></url>
   <inceptionYear>2012</inceptionYear>
 
   <prerequisites>
@@ -15,6 +19,7 @@
   </prerequisites>
 
   <properties>
+    <scalastyle.version>0.1.0</scalastyle.version>
     <maven.version>3.0</maven.version>
     <maven.compiler.source>1.5</maven.compiler.source>
     <maven.compiler.target>1.5</maven.compiler.target>
@@ -28,7 +33,7 @@
     <dependency>
       <groupId>org.scalastyle</groupId>
       <artifactId>scalastyle_${scala.version}</artifactId>
-      <version>0.1.0-SNAPSHOT</version>
+      <version>${scalastyle.version}</version>
     </dependency>
 
     <dependency>
@@ -61,15 +66,23 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.scala-tools</groupId>
-        <artifactId>maven-scala-plugin</artifactId>
-        <version>2.15.2</version>
+        <groupId>net.alchim31.maven</groupId>
+        <artifactId>scala-maven-plugin</artifactId>
+        <version>3.1.0</version>
         <executions>
           <execution>
             <goals>
               <goal>add-source</goal>
               <goal>compile</goal>
               <goal>testCompile</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>scala-docjar</id>
+            <phase>package</phase>
+            <goals>
+              <goal>doc</goal>
+              <goal>doc-jar</goal>
             </goals>
           </execution>
         </executions>
@@ -128,17 +141,19 @@
               <pluginExecutions>
                 <pluginExecution>
                   <pluginExecutionFilter>
-                    <groupId>org.scala-tools</groupId>
-                    <artifactId>maven-scala-plugin</artifactId>
-                    <versionRange>[2.15.2,)</versionRange>
+                    <groupId>net.alchim31.maven</groupId>
+                    <artifactId>scala-maven-plugin</artifactId>
+                    <versionRange>[3.1.0,)</versionRange>
                     <goals>
                       <goal>add-source</goal>
                       <goal>compile</goal>
                       <goal>testCompile</goal>
+                      <goal>doc</goal>
+                      <goal>doc-jar</goal>
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore></ignore>
+                    <ignore />
                   </action>
                 </pluginExecution>
               </pluginExecutions>
@@ -179,22 +194,15 @@
     </profile>
   </profiles>
 
-  <distributionManagement>
-    <snapshotRepository>
-      <uniqueVersion>true</uniqueVersion>
-      <id>sonatype-nexus-snapshots</id>
-      <name>Nexus Staging Repository</name>
-      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-      <layout>default</layout>
-    </snapshotRepository>
-  </distributionManagement>
-
+  <url>http://www.scalastyle.org</url>
   <organization>
     <name>Scalastyle Organization</name>
     <url>https://github.com/scalastyle</url>
   </organization>
   <scm>
-    <url>https://github.com/scalastyle/scalastyle-maven-plugin</url>
+    <connection>scm:git:git@github.com:scalastyle/scalastyle-maven-plugin.git</connection>
+    <url>scm:git:git@github.com:scalastyle/scalastyle-maven-plugin.git</url>
+    <developerConnection>scm:git:git@github.com:scalastyle/scalastyle-maven-plugin.git</developerConnection>
   </scm>
   <issueManagement>
     <system>Github</system>
