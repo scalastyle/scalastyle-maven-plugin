@@ -142,6 +142,7 @@
               <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
               <debug>false</debug>
               <streamLogs>true</streamLogs>
+              <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
               <properties>
                 <src.it>${basedir}/src/it</src.it>
               </properties>

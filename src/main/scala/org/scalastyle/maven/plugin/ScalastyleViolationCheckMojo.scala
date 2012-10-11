@@ -153,6 +153,14 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
     if (skip) {
       getLog.debug("Scalastyle:check is skipped as it is turned on")
     } else {
+      getLog.debug("failOnWarning=" + failOnWarning)
+      getLog.debug("verbose=" + verbose)
+      getLog.debug("quiet=" + quiet)
+      getLog.debug("sourceDirectory=" + sourceDirectory)
+      getLog.debug("testSourceDirectory=" + testSourceDirectory.getAbsolutePath())
+      getLog.debug("includeTestSourceDirectory=" + includeTestSourceDirectory)
+      getLog.debug("buildDirectory=" + buildDirectory)
+      getLog.debug("baseDirectory=" + baseDirectory)
       performCheck()
     }
   }
@@ -167,6 +175,10 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
       val outputResult = new TextOutput[FileSpec](verbose, quiet).output(messages)
 
       // scalastyle:off regex
+      if (outputFile != null) {
+        println("Saving to outputFile=" + outputFile.getAbsolutePath());
+        XmlOutput.save(outputFile, messages)
+      }
       if (!quiet) println("Processed " + outputResult.files + " file(s)")
       if (!quiet) println("Found " + outputResult.errors + " errors")
       if (!quiet) println("Found " + outputResult.warnings + " warnings")
