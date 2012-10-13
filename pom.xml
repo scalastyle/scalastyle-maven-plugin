@@ -158,7 +158,7 @@
               <execution>
                 <id>integration-test</id>
                 <goals>
-                  <goal>integration-test</goal>
+                  <goal>install</goal>
                   <goal>run</goal>
                 </goals>
               </execution>

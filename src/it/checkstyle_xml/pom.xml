@@ -25,6 +25,7 @@
           <sourceDirectory>${src.it}/testsrc</sourceDirectory>
           <configLocation>${src.it}/scalastyle_config.xml</configLocation>
           <outputFile>${project.basedir}/scalastyle-output.xml</outputFile>
+          <outputEncoding>UTF-16</outputEncoding>
         </configuration>
         <executions>
           <execution>

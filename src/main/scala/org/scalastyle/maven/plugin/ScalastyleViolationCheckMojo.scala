@@ -22,6 +22,7 @@ import org.scalastyle._
 import org.apache.maven.plugin.{MojoExecutionException, MojoFailureException, AbstractMojo}
 import org.scala_tools.maven.mojo.annotations._
 import java.util.Date
+import scala.io.Codec;
 
 /**
  * Entry point for scalastyle maven plugin.
@@ -50,6 +51,14 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
   @parameter
   @expression("${scalastyle.output.file}")
   var outputFile: File = _
+
+  /**
+   * Specifies the encoding of the Scalastyle (XML) output
+   * @parameter expression="${scalastyle.output.encoding}"
+   */
+  @parameter
+  @expression("${scalastyle.output.encoding}")
+  var outputEncoding: String = _
 
   /**
    * Whether to fail the build if the validation check fails.
@@ -147,6 +156,16 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
   @required
   var baseDirectory: File = _
 
+  /**
+   * Specifies the encoding of the source files
+   *
+   * @parameter expression="${scalastyle.input.encoding}"
+   * @required
+   */
+  @parameter
+  @expression("${scalastyle.input.encoding}")
+  var inputEncoding: String = _
+
   @throws(classOf[MojoExecutionException])
   @throws(classOf[MojoFailureException])
   def execute() {
@@ -161,6 +180,9 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
       getLog.debug("includeTestSourceDirectory=" + includeTestSourceDirectory)
       getLog.debug("buildDirectory=" + buildDirectory)
       getLog.debug("baseDirectory=" + baseDirectory)
+      getLog.debug("outputFile=" + outputFile)
+      getLog.debug("outputEncoding=" + outputEncoding)
+      getLog.debug("inputEncoding=" + inputEncoding)
       performCheck()
     }
   }
@@ -170,14 +192,14 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
     try {
       val configuration = ScalastyleConfiguration.readFromXml(configLocation)
       val start = now()
-      val messages = new ScalastyleChecker[FileSpec].checkFiles(configuration, getFilesToProcess)
+      val messages = new ScalastyleChecker().checkFiles(configuration, getFilesToProcess)
 
-      val outputResult = new TextOutput[FileSpec](verbose, quiet).output(messages)
+      val outputResult = new TextOutput(verbose, quiet).output(messages)
 
       // scalastyle:off regex
       if (outputFile != null) {
         println("Saving to outputFile=" + outputFile.getAbsolutePath());
-        XmlOutput.save(outputFile, messages)
+        saveToXml(outputFile, Some(outputEncoding), messages)
       }
       if (!quiet) println("Processed " + outputResult.files + " file(s)")
       if (!quiet) println("Found " + outputResult.errors + " errors")
@@ -201,6 +223,10 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
     }
   }
 
+  private[this] def saveToXml(outputFile: java.io.File, encoding: Option[String], messages: List[Message[FileSpec]])(implicit codec: Codec) = {
+    XmlOutput.save(outputFile, encoding.getOrElse(codec.charSet.toString()), messages)
+  }
+
   private[this] def now(): Long = new Date().getTime()
 
   private[this] def checkConfigFile(configLocation: String): Unit = {
@@ -214,16 +240,16 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
   }
 
   private[this] def getFilesToProcess: List[FileSpec] = {
-    val sd = getFiles("sourceDirectory", sourceDirectory)
-    val tsd = if (includeTestSourceDirectory) getFiles("testSourceDirectory", testSourceDirectory) else Nil
+    val sd = getFiles("sourceDirectory", sourceDirectory, inputEncoding)
+    val tsd = if (includeTestSourceDirectory) getFiles("testSourceDirectory", testSourceDirectory, inputEncoding) else Nil
 
     sd ::: tsd
   }
 
-  private[this] def getFiles(name: String, file: File) = {
+  private[this] def getFiles(name: String, file: File, encoding: String) = {
     if (isDirectory(file)) {
-      getLog.debug("processing " + name + "=" + file)
-      Directory.getFiles(file)
+      getLog.debug("processing " + name + "=" + file + " encoding=" + encoding)
+      Directory.getFiles(Option[String](encoding), List(file))
     } else {
       getLog.warn(name + " is not specified or does not exist value=" + file)
       Nil
