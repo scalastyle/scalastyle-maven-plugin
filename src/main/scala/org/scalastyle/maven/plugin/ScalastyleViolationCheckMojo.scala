@@ -17,12 +17,27 @@
 package org.scalastyle.maven.plugin
 
 import java.io.File
-import collection.mutable.ListBuffer
-import org.scalastyle._
-import org.apache.maven.plugin.{MojoExecutionException, MojoFailureException, AbstractMojo}
-import org.scala_tools.maven.mojo.annotations._
 import java.util.Date
-import scala.io.Codec;
+
+import scala.io.Codec
+
+import org.apache.maven.plugin.MojoExecutionException
+import org.apache.maven.plugin.MojoFailureException
+import org.apache.maven.plugin.AbstractMojo
+import org.scala_tools.maven.mojo.annotations.description
+import org.scala_tools.maven.mojo.annotations.expression
+import org.scala_tools.maven.mojo.annotations.goal
+import org.scala_tools.maven.mojo.annotations.parameter
+import org.scala_tools.maven.mojo.annotations.phase
+import org.scala_tools.maven.mojo.annotations.required
+import org.scala_tools.maven.mojo.annotations.requiresProject
+import org.scalastyle.Message
+import org.scalastyle.Directory
+import org.scalastyle.FileSpec
+import org.scalastyle.ScalastyleChecker
+import org.scalastyle.ScalastyleConfiguration
+import org.scalastyle.TextOutput
+import org.scalastyle.XmlOutput
 
 /**
  * Entry point for scalastyle maven plugin.
