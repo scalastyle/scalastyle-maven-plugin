@@ -211,7 +211,7 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
 
       val outputResult = new TextOutput(verbose, quiet).output(messages)
 
-      // scalastyle:off regex
+      // scalastyle:off regex multiple.string.literals
       if (outputFile != null) {
         println("Saving to outputFile=" + outputFile.getAbsolutePath());
         saveToXml(outputFile, Some(outputEncoding), messages)
@@ -220,7 +220,7 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
       if (!quiet) println("Found " + outputResult.errors + " errors")
       if (!quiet) println("Found " + outputResult.warnings + " warnings")
       if (!quiet) println("Finished in " + (now - start) + " ms")
-      // scalastyle:on regex
+      // scalastyle:on regex multiple.string.literals
 
       val violations = outputResult.errors + (if (failOnWarning) outputResult.warnings else 0)
 
