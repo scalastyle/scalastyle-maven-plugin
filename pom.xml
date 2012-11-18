@@ -18,7 +18,7 @@
   </prerequisites>
 
   <properties>
-    <scalastyle.version>0.2.0-SNAPSHOT</scalastyle.version>
+    <scalastyle.version>0.2.0</scalastyle.version>
     <maven.version>3.0</maven.version>
     <maven.compiler.source>1.5</maven.compiler.source>
     <maven.compiler.target>1.5</maven.compiler.target>
