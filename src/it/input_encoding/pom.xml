@@ -24,7 +24,9 @@
               <failOnViolation>true</failOnViolation>
               <includeTestSourceDirectory>true</includeTestSourceDirectory>
               <failOnWarning>false</failOnWarning>
-              <sourceDirectory>${project.basedir}/src</sourceDirectory>
+              <sourceDirectories>
+                <dir>${project.basedir}/src</dir>
+              </sourceDirectories>
               <configLocation>${src.it}/scalastyle_config.xml</configLocation>
               <inputEncoding>UTF-16</inputEncoding>
                 

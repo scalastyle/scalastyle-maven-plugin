@@ -22,7 +22,9 @@
           <failOnViolation>true</failOnViolation>
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
           <failOnWarning>false</failOnWarning>
-          <sourceDirectory>${src.it}/testsrc</sourceDirectory>
+          <sourceDirectories>
+            <dir>${src.it}/testsrc</dir>
+          </sourceDirectories>
           <configLocation>${src.it}/scalastyle_config.xml</configLocation>
           <outputFile>${project.basedir}/scalastyle-output.xml</outputFile>
           <outputEncoding>UTF-16</outputEncoding>

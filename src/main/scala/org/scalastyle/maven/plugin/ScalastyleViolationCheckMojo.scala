@@ -122,25 +122,26 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
   var quiet: java.lang.Boolean = false
 
   /**
-   * Specifies the location of the scala source directory to be used for Scalastyle.
-   *
-   * @parameter default-value="${project.build.sourceDirectory}"
-   * @required
+   * Specifies the location of the Scala source directories to be used for Scalastyle.
    */
   @parameter
-  @expression("${project.build.sourceDirectory}")
-  @required
-  var sourceDirectory: File = _
+  var sourceDirectories: Array[File] = _
 
   /**
-   * Specifies the location of the scala test source directory to be used for Scalastyle.
+   * Specifies the location of the Scala test source directories to be used for Scalastyle.
+   */
+  @parameter
+  var testSourceDirectories: Array[File] = _
+
+  /**
+   * Specifies the location of the default Scala test source directory to be used for Scalastyle.
    *
-   * @parameter default-value="${project.build.testSourceDirectory}"
+   * This directory is only used if no other test source directories are defined.
    */
   @parameter
   @expression("${project.build.testSourceDirectory}")
   @required
-  var testSourceDirectory: File = _
+  var stdTestSourceDirectory: File = _
 
   /**
    * Include or not the test source directory in the Scalastyle checks.
@@ -190,8 +191,10 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
       getLog.debug("failOnWarning=" + failOnWarning)
       getLog.debug("verbose=" + verbose)
       getLog.debug("quiet=" + quiet)
-      getLog.debug("sourceDirectory=" + sourceDirectory)
-      getLog.debug("testSourceDirectory=" + testSourceDirectory.getAbsolutePath())
+      for (d <- sourceDirectoriesAsList)
+        getLog.debug("sourceDirectory=" + d)
+      for (d <- testSourceDirectoriesAsList)
+        getLog.debug("testSourceDirectory=" + d)
       getLog.debug("includeTestSourceDirectory=" + includeTestSourceDirectory)
       getLog.debug("buildDirectory=" + buildDirectory)
       getLog.debug("baseDirectory=" + baseDirectory)
@@ -255,21 +258,34 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
   }
 
   private[this] def getFilesToProcess: List[FileSpec] = {
-    val sd = getFiles("sourceDirectory", sourceDirectory, inputEncoding)
-    val tsd = if (includeTestSourceDirectory) getFiles("testSourceDirectory", testSourceDirectory, inputEncoding) else Nil
+    val sd = getFiles("sourceDirectory", sourceDirectoriesAsList, inputEncoding)
+    val tsd = getFiles("testSourceDirectory", testSourceDirectoriesAsList, inputEncoding)
 
     sd ::: tsd
   }
 
-  private[this] def getFiles(name: String, file: File, encoding: String) = {
-    if (isDirectory(file)) {
-      getLog.debug("processing " + name + "=" + file + " encoding=" + encoding)
-      Directory.getFiles(Option[String](encoding), List(file))
-    } else {
-      getLog.warn(name + " is not specified or does not exist value=" + file)
-      Nil
+  private[this] def getFiles(name: String, dirs: List[File], encoding: String) = {
+    dirs flatMap { dir =>
+      if (isDirectory(dir)) {
+        getLog.debug("processing " + name + "=" + dir + " encoding=" + encoding)
+        Directory.getFiles(Option[String](encoding), List(dir))
+      } else {
+        getLog.warn(name + " is not specified or does not exist value=" + dir)
+        Nil
+      }
     }
   }
 
   private[this] def isDirectory(file: File) = file != null && file.exists() && file.isDirectory()
+
+  private[this] lazy val sourceDirectoriesAsList =
+    Option(sourceDirectories).map(_.toList).getOrElse(Nil)
+
+  private[this] lazy val testSourceDirectoriesAsList =
+    if (!includeTestSourceDirectory) Nil
+    else {
+      val dirs = Option(testSourceDirectories).map(_.toList)
+      val std = Option(stdTestSourceDirectory).map(List(_)).getOrElse(Nil)
+      dirs.getOrElse(std)
+    }
 }
