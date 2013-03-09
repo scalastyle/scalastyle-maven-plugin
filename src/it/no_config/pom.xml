@@ -24,7 +24,9 @@
               <failOnViolation>true</failOnViolation>
               <includeTestSourceDirectory>true</includeTestSourceDirectory>
               <failOnWarning>true</failOnWarning>
-              <sourceDirectory>${src.it}/testsrc</sourceDirectory>
+              <sourceDirectories>
+                <dir>${src.it}/testsrc</dir>
+              </sourceDirectories>
               <configLocation>${src.it}/this.does.not.exist.xml</configLocation>
                 
                 </configuration>
