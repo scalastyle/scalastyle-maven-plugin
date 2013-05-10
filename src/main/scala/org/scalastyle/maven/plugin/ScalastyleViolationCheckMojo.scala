@@ -123,25 +123,29 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
 
   /**
    * Specifies the location of the Scala source directories to be used for Scalastyle.
+   * This is only used if sourceDirectories is not specified
+   */
+  @parameter
+  var sourceDirectory: File = _
+
+  /**
+   * Specifies the location of the Scala source directories to be used for Scalastyle.
    */
   @parameter
   var sourceDirectories: Array[File] = _
 
   /**
    * Specifies the location of the Scala test source directories to be used for Scalastyle.
+   * Only used if testSourceDirectories is not specified
+   */
+  @parameter
+  var testSourceDirectory: File = _
+
+  /**
+   * Specifies the location of the Scala test source directories to be used for Scalastyle.
    */
   @parameter
   var testSourceDirectories: Array[File] = _
-
-  /**
-   * Specifies the location of the default Scala test source directory to be used for Scalastyle.
-   *
-   * This directory is only used if no other test source directories are defined.
-   */
-  @parameter
-  @expression("${project.build.testSourceDirectory}")
-  @required
-  var stdTestSourceDirectory: File = _
 
   /**
    * Include or not the test source directory in the Scalastyle checks.
@@ -278,14 +282,14 @@ class ScalastyleViolationCheckMojo extends AbstractMojo {
 
   private[this] def isDirectory(file: File) = file != null && file.exists() && file.isDirectory()
 
-  private[this] lazy val sourceDirectoriesAsList =
-    Option(sourceDirectories).map(_.toList).getOrElse(Nil)
+  private[this] lazy val sourceDirectoriesAsList = arrayOrValue(sourceDirectories, sourceDirectory)
 
   private[this] lazy val testSourceDirectoriesAsList =
-    if (!includeTestSourceDirectory) Nil
-    else {
-      val dirs = Option(testSourceDirectories).map(_.toList)
-      val std = Option(stdTestSourceDirectory).map(List(_)).getOrElse(Nil)
+    if (!includeTestSourceDirectory) Nil else arrayOrValue(testSourceDirectories, testSourceDirectory)
+
+  private[this] def arrayOrValue(array: Array[File], value: File) = {
+      val dirs = Option(array).map(_.toList)
+      val std = Option(value).map(List(_)).getOrElse(Nil)
       dirs.getOrElse(std)
-    }
+  }
 }

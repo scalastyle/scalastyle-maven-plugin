@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>it.scalastyle-maven-plugin</groupId>
+    <artifactId>basic</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>Test for deprecated criteria</name>
+    <description>Test for deprecated criteria</description>
+    <packaging>pom</packaging>
+    <dependencies>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>@project.groupId@</groupId>
+                <artifactId>@project.artifactId@</artifactId>
+                <version>@project.version@</version>
+                <configuration>
+              <verbose>true</verbose>
+              <failOnViolation>true</failOnViolation>
+              <includeTestSourceDirectory>true</includeTestSourceDirectory>
+              <failOnWarning>false</failOnWarning>
+              <sourceDirectory>${src.it}/testsrc</sourceDirectory>
+              <testSourceDirectory>${src.it}/testsrc2</testSourceDirectory>
+              <configLocation>${src.it}/scalastyle_config.xml</configLocation>
+                
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>scalastyle</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
