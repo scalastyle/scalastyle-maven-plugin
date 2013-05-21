@@ -20,7 +20,7 @@
 
   <properties>
     <scalastyle.artifactId>scalastyle_2.10</scalastyle.artifactId>
-    <scalastyle.version>0.3.1-SNAPSHOT</scalastyle.version>
+    <scalastyle.version>0.3.1</scalastyle.version>
     <maven.version>3.0</maven.version>
     <maven.compiler.source>1.5</maven.compiler.source>
     <maven.compiler.target>1.5</maven.compiler.target>
