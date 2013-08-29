@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+ <modelVersion>4.0.0</modelVersion>
+
+ <groupId>it.scalastyle-maven-plugin</groupId>
+ <artifactId>classpath-config</artifactId>
+ <version>1.0-SNAPSHOT</version>
+ <name>Test classpath config file</name>
+ <description>Test that scalastyle config file acn be resolved from classpath</description>
+ <packaging>pom</packaging>
+ <dependencies>
+ </dependencies>
+
+ <build>
+  <plugins>
+   <plugin>
+    <groupId>@project.groupId@</groupId>
+    <artifactId>@project.artifactId@</artifactId>
+    <version>@project.version@</version>
+    <configuration>
+     <verbose>true</verbose>
+     <failOnViolation>true</failOnViolation>
+     <includeTestSourceDirectory>true</includeTestSourceDirectory>
+     <failOnWarning>false</failOnWarning>
+     <sourceDirectories>
+      <dir>${src.it}/testsrc</dir>
+     </sourceDirectories>
+     <configLocation>org/scalastyle/classpath_scalastyle_config.xml</configLocation>
+    </configuration>
+    <executions>
+     <execution>
+      <id>scalastyle</id>
+      <phase>process-sources</phase>
+      <goals>
+       <goal>check</goal>
+      </goals>
+     </execution>
+    </executions>
+   </plugin>
+  </plugins>
+ </build>
+</project>
