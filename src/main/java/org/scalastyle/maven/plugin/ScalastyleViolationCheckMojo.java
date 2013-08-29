@@ -18,6 +18,8 @@ package org.scalastyle.maven.plugin;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,12 +27,15 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.*;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.resource.ResourceManager;
+import org.codehaus.plexus.resource.loader.FileResourceCreationException;
+import org.codehaus.plexus.resource.loader.ResourceNotFoundException;
 import org.scalastyle.Directory;
 import org.scalastyle.FileSpec;
 import org.scalastyle.Message;
@@ -45,12 +50,25 @@ import scala.Option;
 /**
  * Entry point for scalastyle maven plugin.
  */
-@Mojo(name = "check", defaultPhase = LifecyclePhase.VERIFY, requiresProject = true)
+@Mojo(name = "check", defaultPhase = LifecyclePhase.VERIFY, requiresProject = true, requiresDependencyResolution = ResolutionScope.TEST)
 public class ScalastyleViolationCheckMojo extends AbstractMojo {
+
     /**
-     * Specifies the configuration file location
+     * <p>
+     * Specifies the location of the scalstyle XML configuration file to use.
+     * </p>
+     * <p>
+     * Potential values are a filesystem path, a URL, or a classpath resource.
+     * </p>
+     * <p>
+     * This parameter is resolved as file, classpath resource then URL.
+     * </p>
+     * <p>
+     * <b>default_config.xml</b> from scalastyle classpath jar is used if non is specified in configuration
+     * </p>
+     * <p/>
      */
-    @Parameter(property = "scalastyle.config.location", required = true)
+    @Parameter(property = "scalastyle.config.location", required = true, defaultValue = "default_config.xml")
     private String configLocation;
 
     /**
@@ -147,6 +165,16 @@ public class ScalastyleViolationCheckMojo extends AbstractMojo {
     @Parameter(property = "scalastyle.input.encoding")
     private String inputEncoding;
 
+
+    /**
+     * The Maven Project Object.
+     */
+    @Component
+    protected MavenProject project;
+
+    @Component
+    private ResourceManager resourceManager;
+
     public void execute() throws MojoFailureException, MojoExecutionException {
         if (Boolean.TRUE.equals(skip)) {
             getLog().warn("Scalastyle:check is skipped as scalastyle.skip=true");
@@ -175,10 +203,8 @@ public class ScalastyleViolationCheckMojo extends AbstractMojo {
     }
 
     private void performCheck() throws MojoFailureException, MojoExecutionException {
-        checkConfigFile(configLocation);
-
         try {
-            ScalastyleConfiguration configuration = ScalastyleConfiguration.readFromXml(configLocation);
+            ScalastyleConfiguration configuration = ScalastyleConfiguration.readFromXml(getConfigFile(configLocation));
             long start = now();
             List<Message<FileSpec>> messages = new ScalastyleChecker<FileSpec>().checkFilesAsJava(configuration, getFilesToProcess());
 
@@ -221,14 +247,55 @@ public class ScalastyleViolationCheckMojo extends AbstractMojo {
         return new Date().getTime();
     }
 
-    private void checkConfigFile(String configLocation) throws MojoFailureException, MojoExecutionException {
+    private String getConfigFile(String configLocation) throws MojoFailureException {
         if (configLocation == null) {
             throw new MojoFailureException("configLocation is required");
         }
 
-        if (!new File(configLocation).exists()) {
-            throw new MojoFailureException("configLocation " + configLocation + " does not exist");
+        if (new File(configLocation).exists()) {
+            return configLocation;
         }
+
+        ClassLoader original = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(getClassLoaderWithProjectResources());
+            File configFile = resourceManager.getResourceAsFile(configLocation);
+            if ( configFile == null ){
+                throw new MojoFailureException("Unable to process configuration file at location "+ configLocation);
+            }
+            return configFile.getAbsolutePath();
+        } catch (ResourceNotFoundException e) {
+            throw new MojoFailureException("Unable to find configuration file at location "+ configLocation);
+        } catch (FileResourceCreationException e) {
+            throw new MojoFailureException("Unable to process configuration file at location "+ configLocation,e);
+        }finally {
+            Thread.currentThread().setContextClassLoader(original);
+        }
+
+    }
+
+    private URLClassLoader getClassLoaderWithProjectResources() throws MojoFailureException {
+        List<String> classPathStrings = new ArrayList<String>();
+        List<URL> urls = new ArrayList<URL>( classPathStrings.size() );
+
+        try {
+            classPathStrings.addAll(project.getTestCompileSourceRoots());
+            classPathStrings.addAll(project.getCompileSourceRoots());
+
+            for(Resource resource:project.getTestResources()){
+                classPathStrings.add(resource.getDirectory());
+            }
+            for(Resource resource:project.getResources()){
+                classPathStrings.add(resource.getDirectory());
+            }
+            for ( String path : classPathStrings ){
+                urls.add(new File(path).toURI().toURL());
+            }
+        } catch (Exception e) {
+            throw new MojoFailureException(e.getMessage(),e);
+        }
+
+        return new URLClassLoader(urls.toArray(new URL[urls.size()]), Thread.currentThread().getContextClassLoader());
     }
 
     private List<FileSpec> getFilesToProcess() {
@@ -271,3 +338,4 @@ public class ScalastyleViolationCheckMojo extends AbstractMojo {
         return (array != null) ? Arrays.asList(array) : Collections.singletonList(value);
     }
 }
+
