@@ -1,0 +1,8 @@
+<scalastyle>
+ <name>Scalastyle standard configuration for maven tests</name>
+ <check level="error" class="org.scalastyle.file.FileLengthChecker" enabled="true">
+  <parameters>
+   <parameter name="maxFileLength">1</parameter>
+  </parameters>
+ </check>
+</scalastyle>

@@ -219,6 +219,7 @@ public class ScalastyleViolationCheckMojo extends AbstractMojo {
                 System.out.println("Processed " + outputResult.files() + " file(s)");
                 System.out.println("Found " + outputResult.errors() + " errors");
                 System.out.println("Found " + outputResult.warnings() + " warnings");
+                System.out.println("Found " + outputResult.infos() + " infos");
                 System.out.println("Finished in " + (now() - start) + " ms");
             }
 
