@@ -17,7 +17,6 @@
 package org.scalastyle.maven.plugin;
 
 import java.io.File;
-import java.math.BigInteger;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -198,8 +197,6 @@ public class ScalastyleViolationCheckMojo extends AbstractMojo {
 
             performCheck();
         }
-
-        new BigInteger("6");
     }
 
     private void performCheck() throws MojoFailureException, MojoExecutionException {
