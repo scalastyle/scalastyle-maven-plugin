@@ -30,7 +30,11 @@ import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.*;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.resource.ResourceManager;
 import org.codehaus.plexus.resource.loader.FileResourceCreationException;
@@ -45,6 +49,9 @@ import org.scalastyle.TextOutput;
 import org.scalastyle.XmlOutput;
 
 import scala.Option;
+
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
 /**
  * Entry point for scalastyle maven plugin.
@@ -205,11 +212,12 @@ public class ScalastyleViolationCheckMojo extends AbstractMojo {
             long start = now();
             List<Message<FileSpec>> messages = new ScalastyleChecker<FileSpec>().checkFilesAsJava(configuration, getFilesToProcess());
 
-            OutputResult outputResult = new TextOutput<FileSpec>(verbose, quiet).output(messages);
+            Config config = ConfigFactory.load(new ScalastyleChecker<FileSpec>().getClass().getClassLoader());
+            OutputResult outputResult = new TextOutput<FileSpec>(config, verbose, quiet).output(messages);
 
             if (outputFile != null) {
                 System.out.println("Saving to outputFile=" + outputFile.getAbsolutePath());
-                saveToXml(outputFile, outputEncoding, messages);
+                saveToXml(config, outputFile, outputEncoding, messages);
             }
 
             if (!quiet) {
@@ -236,9 +244,9 @@ public class ScalastyleViolationCheckMojo extends AbstractMojo {
         }
     }
 
-    private void saveToXml(File outputFile, String encodingString, List<Message<FileSpec>> messages) {
+    private void saveToXml(Config config, File outputFile, String encodingString, List<Message<FileSpec>> messages) {
         String encoding = (encodingString != null) ? encodingString : System.getProperty("file.encoding");
-        XmlOutput.save(outputFile.getAbsolutePath(), encoding, messages);
+        XmlOutput.save(config, outputFile.getAbsolutePath(), encoding, messages);
     }
 
     private long now() {
