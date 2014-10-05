@@ -18,7 +18,7 @@
   </prerequisites>
 
   <properties>
-    <scalastyle.artifactId>scalastyle_2.10</scalastyle.artifactId>
+    <scalastyle.artifactId>scalastyle_2.11</scalastyle.artifactId>
     <scalastyle.version>0.6.0-SNAPSHOT</scalastyle.version>
     <maven.version>3.0</maven.version>
     <maven.compiler.source>1.5</maven.compiler.source>
@@ -209,6 +209,36 @@
             </executions>
           </plugin>
         </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>scalastyle-test</id>
+      <build>
+        <plugins>
+         <plugin>
+            <groupId>org.scalastyle</groupId>
+            <artifactId>scalastyle-maven-plugin</artifactId>
+            <version>0.6.0-SNAPSHOT</version>
+            <configuration>
+              <verbose>false</verbose>
+              <failOnViolation>true</failOnViolation>
+              <includeTestSourceDirectory>true</includeTestSourceDirectory>
+              <failOnWarning>false</failOnWarning>
+              <sourceDirectory>${basedir}/../../spray</sourceDirectory>
+              <testSourceDirectory>${basedir}/src/test/scala</testSourceDirectory>
+              <configLocation>${basedir}/build-tools/scalastyle_config.xml</configLocation>
+              <outputFile>${project.build.directory}/scalastyle-output.xml</outputFile>
+              <outputEncoding>UTF-8</outputEncoding>
+            </configuration>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+       </plugins>
       </build>
     </profile>
   </profiles>
