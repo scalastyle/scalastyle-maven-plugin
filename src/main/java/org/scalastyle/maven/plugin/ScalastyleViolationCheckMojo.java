@@ -210,9 +210,12 @@ public class ScalastyleViolationCheckMojo extends AbstractMojo {
         try {
             ScalastyleConfiguration configuration = ScalastyleConfiguration.readFromXml(getConfigFile(configLocation));
             long start = now();
-            List<Message<FileSpec>> messages = new ScalastyleChecker<FileSpec>().checkFilesAsJava(configuration, getFilesToProcess());
+            final scala.Option<ClassLoader> none = scala.Option$.MODULE$.apply(null);
+            ScalastyleChecker<FileSpec> sc = new ScalastyleChecker<FileSpec>(none);
 
-            Config config = ConfigFactory.load(new ScalastyleChecker<FileSpec>().getClass().getClassLoader());
+            List<Message<FileSpec>> messages = sc.checkFilesAsJava(configuration, getFilesToProcess());
+
+            Config config = ConfigFactory.load(sc.getClass().getClassLoader());
             OutputResult outputResult = new TextOutput<FileSpec>(config, verbose, quiet).output(messages);
 
             if (outputFile != null) {
