@@ -8,7 +8,7 @@
  <groupId>org.scalastyle</groupId>
  <artifactId>scalastyle-maven-plugin</artifactId>
  <packaging>maven-plugin</packaging>
- <version>0.8.0-SNAPSHOT</version>
+ <version>0.8.0</version>
  <name>Scalastyle Maven Plugin</name>
  <description>Integrates Scalastyle style checker for Scala with maven</description>
  <inceptionYear>2012</inceptionYear>
@@ -19,7 +19,7 @@
 
  <properties>
   <scalastyle.artifactId>scalastyle_2.11</scalastyle.artifactId>
-  <scalastyle.version>0.8.0-SNAPSHOT</scalastyle.version>
+  <scalastyle.version>0.8.0</scalastyle.version>
   <maven.version>3.0</maven.version>
   <maven.compiler.source>1.5</maven.compiler.source>
   <maven.compiler.target>1.5</maven.compiler.target>
