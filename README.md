@@ -12,31 +12,46 @@ It counts the number of violations found and displays it on the console if verbo
 To Configure the Scalastyle Plugin, you need to the add it in the <build> section of your pom.xml as shown in the sample below,
 and by default the build will fail if there are any violations of level error found.
 Default phase of execution is `verify`. The following is an example of a configuration which would be used in a pom:
- 
-      <build>
-         <plugins> 
+
+```xml
+    <build>
+        <plugins> 
           ...
-		  <plugin>
-			<groupId>org.scalastyle</groupId>
-			<artifactId>scalastyle-maven-plugin</artifactId>
-			<version>0.1.0</version>
-			<configuration>
-			  <verbose>false</verbose>
-			  <failOnViolation>true</failOnViolation>
-			  <includeTestSourceDirectory>true</includeTestSourceDirectory>
-			  <failOnWarning>false</failOnWarning>
-			  <sourceDirectory>${project.basedir}/src/main/scala</sourceDirectory>
-			  <testSourceDirectory>${project.basedir}/src/test/scala</testSourceDirectory>
-			  <configLocation>${project.basedir}/lib/scalastyle_config.xml</configLocation>
-			</configuration>
-			<executions>
-			  <execution>
-				<goals>
-				  <goal>check</goal>
-				</goals>
-			  </execution>
-			</executions>
-		  </plugin>
-            ...
+          <plugin>
+            <groupId>org.scalastyle</groupId>
+            <artifactId>scalastyle-maven-plugin</artifactId>
+            <version>0.8.0</version>
+            <configuration>
+              <verbose>false</verbose>
+              <failOnViolation>true</failOnViolation>
+              <includeTestSourceDirectory>true</includeTestSourceDirectory>
+              <failOnWarning>false</failOnWarning>
+              <sourceDirectory>${project.basedir}/src/main/scala</sourceDirectory>
+              <testSourceDirectory>${project.basedir}/src/test/scala</testSourceDirectory>
+              <configLocation>${project.basedir}/lib/scalastyle_config.xml</configLocation>
+              <outputFile>${project.basedir}/scalastyle-output.xml</outputFile>
+              <outputEncoding>UTF-8</outputEncoding>
+            </configuration>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          ...
         </plugins>
     </build>
+```
+
+You can also specify multiple source directories if necessary. Replace the <sourceDirectory> element with <sourceDirectories>:
+
+```xml
+    <sourceDirectories>
+      <dir>${project.basedir}/src/main/scala</dir>
+      <dir>${project.basedir}/src/main/generated-scala</dir>
+    </sourceDirectories>
+```
+
+and similarly for <testSourceDirectory> & <testSourceDirectories>.
