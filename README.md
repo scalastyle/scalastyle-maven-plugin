@@ -54,4 +54,4 @@ You can also specify multiple source directories if necessary. Replace the <sour
     </sourceDirectories>
 ```
 
-and similarly for <testSourceDirectory> & <testSourceDirectories>.
+and similarly for `testSourceDirectory` & `testSourceDirectories`.
