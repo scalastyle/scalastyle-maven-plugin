@@ -25,9 +25,9 @@ Default phase of execution is `verify`. The following is an example of a configu
 			  <failOnViolation>true</failOnViolation>
 			  <includeTestSourceDirectory>true</includeTestSourceDirectory>
 			  <failOnWarning>false</failOnWarning>
-			  <sourceDirectory>${basedir}/src/main/scala</sourceDirectory>
-			  <testSourceDirectory>${basedir}/src/test/scala</testSourceDirectory>
-			  <configLocation>${basedir}/lib/scalastyle_config.xml</configLocation>
+			  <sourceDirectory>${project.basedir}/src/main/scala</sourceDirectory>
+			  <testSourceDirectory>${project.basedir}/src/test/scala</testSourceDirectory>
+			  <configLocation>${project.basedir}/lib/scalastyle_config.xml</configLocation>
 			</configuration>
 			<executions>
 			  <execution>
