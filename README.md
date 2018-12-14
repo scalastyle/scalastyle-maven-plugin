@@ -31,6 +31,9 @@ Default phase of execution is `verify`. The following is an example of a configu
               <configLocation>${project.basedir}/lib/scalastyle_config.xml</configLocation>
               <outputFile>${project.basedir}/scalastyle-output.xml</outputFile>
               <outputEncoding>UTF-8</outputEncoding>
+              <exclusions>
+                <exclusion>.*directory.*</exclusion>
+              </exclusions>
             </configuration>
             <executions>
               <execution>
@@ -55,3 +58,14 @@ You can also specify multiple source directories if necessary. Replace the <sour
 ```
 
 and similarly for `testSourceDirectory` & `testSourceDirectories`.
+
+You can also specify multiple exclusion filters in form of regex if necessary. Add the <exclusion> element in <exclusions>:
+
+```xml
+    <exclusions>
+      <exclusion>.*testdir1.*</exclusion>
+      <exclusion>.*testdir2.*</exclusion>
+    </exclusions>
+```
+
+Only files that match **none** of the provided `exclusions` are processed.

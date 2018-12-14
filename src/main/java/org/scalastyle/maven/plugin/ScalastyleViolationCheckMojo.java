@@ -171,6 +171,16 @@ public class ScalastyleViolationCheckMojo extends AbstractMojo {
     @Parameter(property = "scalastyle.input.encoding")
     private String inputEncoding;
 
+    /**
+     * Regex patterns to exclude files. Applies to all sources.
+     */
+    @Parameter(property = "scalastyle.exclusions")
+    private List<String> exclusions;
+
+    /**
+     * Number of excluded files
+     */
+    private int excludedFiles = 0;
 
     /**
      * The Maven Project Object.
@@ -201,6 +211,7 @@ public class ScalastyleViolationCheckMojo extends AbstractMojo {
             getLog().debug("outputFile=" + outputFile);
             getLog().debug("outputEncoding=" + outputEncoding);
             getLog().debug("inputEncoding=" + inputEncoding);
+            getLog().debug("exclusions=" + exclusions);
 
             performCheck();
         }
@@ -225,6 +236,7 @@ public class ScalastyleViolationCheckMojo extends AbstractMojo {
 
             if (!quiet) {
                 System.out.println("Processed " + outputResult.files() + " file(s)");
+                System.out.println("Excluded " + excludedFiles + " file(s)");
                 System.out.println("Found " + outputResult.errors() + " errors");
                 System.out.println("Found " + outputResult.warnings() + " warnings");
                 System.out.println("Found " + outputResult.infos() + " infos");
@@ -313,7 +325,29 @@ public class ScalastyleViolationCheckMojo extends AbstractMojo {
         all.addAll(getFiles("sourceDirectory", sourceDirectoriesAsList(), inputEncoding));
         all.addAll(getFiles("testSourceDirectory", testSourceDirectoriesAsList(), inputEncoding));
 
-        return all;
+        List<FileSpec> filteredList = new ArrayList<FileSpec>();
+
+        if (exclusions != null && exclusions.size() != 0) {
+            for (FileSpec file : all) {
+                boolean check = true;
+
+                for (String exclusion : exclusions) {
+                    if (!check || file.name().matches(exclusion)) {
+                        check = false;
+                    }
+                }
+                if (check)
+                    filteredList.add(file);
+                else if (verbose)
+                    getLog().info("excluded file = " + file.name());
+            }
+        } else {
+            filteredList = all;
+        }
+
+        excludedFiles = all.size() - filteredList.size();
+
+        return filteredList;
     }
 
     private List<FileSpec> getFiles(String name, List<File> dirs, String encoding) {
