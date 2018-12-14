@@ -336,7 +336,10 @@ public class ScalastyleViolationCheckMojo extends AbstractMojo {
                         check = false;
                     }
                 }
-                if (check) filteredList.add(file);
+                if (check)
+                    filteredList.add(file);
+                else if (verbose)
+                    getLog().info("excluded file = " + file.name());
             }
         } else {
             filteredList = all;
