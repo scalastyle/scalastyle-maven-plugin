@@ -61,7 +61,7 @@ public class ScalastyleViolationCheckMojo extends AbstractMojo {
 
     /**
      * <p>
-     * Specifies the location of the scalstyle XML configuration file to use.
+     * Specifies the location of the scalstyle XML configuration file for source directory.
      * </p>
      * <p>
      * Potential values are a filesystem path, a URL, or a classpath resource.
@@ -76,6 +76,24 @@ public class ScalastyleViolationCheckMojo extends AbstractMojo {
      */
     @Parameter(property = "scalastyle.config.location", required = true, defaultValue = "default_config.xml")
     private String configLocation;
+
+    /**
+     * <p>
+     * Specifies the location of the scalstyle XML configuration file for test source directory.
+     * </p>
+     * <p>
+     * Potential values are a filesystem path, a URL, or a classpath resource.
+     * </p>
+     * <p>
+     * This parameter is resolved as file, classpath resource then URL.
+     * </p>
+     * <p>
+     * Source directory config location is used if non is specified in configuration
+     * </p>
+     * <p/>
+     */
+    @Parameter(property = "scalastyle.test.config.location")
+    private String testConfigLocation;
 
     /**
      * Specifies the path and filename to save the Scalastyle output.
@@ -208,12 +226,21 @@ public class ScalastyleViolationCheckMojo extends AbstractMojo {
 
     private void performCheck() throws MojoFailureException, MojoExecutionException {
         try {
-            ScalastyleConfiguration configuration = ScalastyleConfiguration.readFromXml(getConfigFile(configLocation));
+            ScalastyleConfiguration srcConfiguration = ScalastyleConfiguration.readFromXml(getConfigFile(configLocation));
+            ScalastyleConfiguration testConfiguration = srcConfiguration;
+
+            if (testConfigLocation != null) {
+                testConfiguration = ScalastyleConfiguration.readFromXml(getConfigFile(testConfigLocation));
+            }
+
             long start = now();
             final scala.Option<ClassLoader> none = scala.Option$.MODULE$.apply(null);
             ScalastyleChecker<FileSpec> sc = new ScalastyleChecker<FileSpec>(none);
 
-            List<Message<FileSpec>> messages = sc.checkFilesAsJava(configuration, getFilesToProcess());
+            List<Message<FileSpec>> messages = new ArrayList<Message<FileSpec>>();
+            messages.addAll(sc.checkFilesAsJava(srcConfiguration, getSrcFilesToProcess()));
+            messages.addAll(sc.checkFilesAsJava(testConfiguration, getTestFilesToProcess()));
+
 
             Config config = ConfigFactory.load(sc.getClass().getClassLoader());
             OutputResult outputResult = new TextOutput<FileSpec>(config, verbose, quiet).output(messages);
@@ -307,13 +334,12 @@ public class ScalastyleViolationCheckMojo extends AbstractMojo {
         return new URLClassLoader(urls.toArray(new URL[urls.size()]), Thread.currentThread().getContextClassLoader());
     }
 
-    private List<FileSpec> getFilesToProcess() {
-        List<FileSpec> all = new ArrayList<FileSpec>();
+    private List<FileSpec> getSrcFilesToProcess() {
+        return getFiles("sourceDirectory", sourceDirectoriesAsList(), inputEncoding);
+    }
 
-        all.addAll(getFiles("sourceDirectory", sourceDirectoriesAsList(), inputEncoding));
-        all.addAll(getFiles("testSourceDirectory", testSourceDirectoriesAsList(), inputEncoding));
-
-        return all;
+    private List<FileSpec> getTestFilesToProcess() {
+        return getFiles("testSourceDirectory", testSourceDirectoriesAsList(), inputEncoding);
     }
 
     private List<FileSpec> getFiles(String name, List<File> dirs, String encoding) {
