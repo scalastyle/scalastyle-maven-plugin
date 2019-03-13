@@ -29,6 +29,7 @@ Default phase of execution is `verify`. The following is an example of a configu
               <sourceDirectory>${project.basedir}/src/main/scala</sourceDirectory>
               <testSourceDirectory>${project.basedir}/src/test/scala</testSourceDirectory>
               <configLocation>${project.basedir}/lib/scalastyle_config.xml</configLocation>
+              <testConfigLocation>${project.basedir}/lib/scalastyle_test_config.xml</testConfigLocation>
               <outputFile>${project.basedir}/scalastyle-output.xml</outputFile>
               <outputEncoding>UTF-8</outputEncoding>
             </configuration>
