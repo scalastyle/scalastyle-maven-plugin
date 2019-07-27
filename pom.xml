@@ -264,7 +264,7 @@
        <testSourceDirectory>${basedir}/src/test/scala</testSourceDirectory>
        <configLocation>${basedir}/build-tools/scalastyle_config.xml</configLocation>
        <outputFile>${project.build.directory}/scalastyle-output.xml</outputFile>
-       <outputEncoding>UTF-8</outputEncoding>
+       <outputEncoding>${project.build.sourceEncoding}</outputEncoding>
       </configuration>
       <executions>
        <execution>
