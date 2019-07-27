@@ -21,7 +21,7 @@
   <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
   <compiler.java.version>1.8</compiler.java.version>
-  <compiler.scala.compat.version>2.11</compiler.scala.compat.version>
+  <compiler.scala.compat.version>2.12</compiler.scala.compat.version>
   <maven.version>3.6.1</maven.version>
   <maven.compat.version>3.0</maven.compat.version>
 
