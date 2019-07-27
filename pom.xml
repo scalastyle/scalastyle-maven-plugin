@@ -10,26 +10,39 @@
  <packaging>maven-plugin</packaging>
  <version>1.1.0-SNAPSHOT</version>
  <name>Scalastyle Maven Plugin</name>
- <description>Integrates Scalastyle style checker for Scala with maven</description>
+ <description>Integrates Scalastyle style checker for Scala with Maven</description>
  <inceptionYear>2012</inceptionYear>
 
  <prerequisites>
-  <maven>${maven.version}</maven>
+  <maven>${maven.compat.version}</maven>
  </prerequisites>
 
  <properties>
-  <scalastyle.artifactId>scalastyle_2.11</scalastyle.artifactId>
-  <scalastyle.version>1.1.0-SNAPSHOT</scalastyle.version>
-  <maven.version>3.0</maven.version>
-  <maven.compiler.source>1.5</maven.compiler.source>
-  <maven.compiler.target>1.5</maven.compiler.target>
-  <junit.version>4.11</junit.version>
+  <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+  <compiler.java.version>1.8</compiler.java.version>
+  <compiler.scala.compat.version>2.12</compiler.scala.compat.version>
+  <maven.version>3.6.1</maven.version>
+  <maven.compat.version>3.0</maven.compat.version>
+
+  <maven-plugin-plugin.version>3.6.0</maven-plugin-plugin.version>
+  <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+  <maven-source-plugin.version>3.1.0</maven-source-plugin.version>
+  <maven-invoker-plugin.version>3.2.0</maven-invoker-plugin.version>
+  <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
+  <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
+  <maven-plugin-annotations.version>3.6.0</maven-plugin-annotations.version>
+  <plexus-resources.version>1.1.0</plexus-resources.version>
+  <maven-plugin-testing-harness.version>3.3.0</maven-plugin-testing-harness.version>
+
+  <scalastyle.version>1.0.0</scalastyle.version>
+  <junit.version>4.12</junit.version>
  </properties>
 
  <dependencies>
   <dependency>
    <groupId>org.scalastyle</groupId>
-   <artifactId>${scalastyle.artifactId}</artifactId>
+   <artifactId>scalastyle_${compiler.scala.compat.version}</artifactId>
    <version>${scalastyle.version}</version>
   </dependency>
 
@@ -41,7 +54,7 @@
   <dependency>
    <groupId>org.apache.maven.plugin-tools</groupId>
    <artifactId>maven-plugin-annotations</artifactId>
-   <version>3.2</version>
+   <version>${maven-plugin-annotations.version}</version>
    <scope>provided</scope>
   </dependency>
   <dependency>
@@ -53,7 +66,7 @@
   <dependency>
    <groupId>org.codehaus.plexus</groupId>
    <artifactId>plexus-resources</artifactId>
-   <version>1.0-alpha-7</version>
+   <version>${plexus-resources.version}</version>
   </dependency>
 
   <dependency>
@@ -66,7 +79,7 @@
   <dependency>
    <groupId>org.apache.maven.plugin-testing</groupId>
    <artifactId>maven-plugin-testing-harness</artifactId>
-   <version>1.2</version>
+   <version>${maven-plugin-testing-harness.version}</version>
    <scope>test</scope>
   </dependency>
 
@@ -77,7 +90,7 @@
    <plugin>
     <groupId>org.apache.maven.plugins</groupId>
     <artifactId>maven-plugin-plugin</artifactId>
-    <version>3.2</version>
+    <version>${maven-plugin-plugin.version}</version>
     <configuration>
      <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
     </configuration>
@@ -99,17 +112,17 @@
    <plugin>
     <groupId>org.apache.maven.plugins</groupId>
     <artifactId>maven-compiler-plugin</artifactId>
-    <version>2.3.2</version>
+    <version>${maven-compiler-plugin.version}</version>
     <configuration>
-     <source>1.5</source>
-     <target>1.5</target>
-     <encoding>UTF-8</encoding>
+     <source>${compiler.java.version}</source>
+     <target>${compiler.java.version}</target>
+     <encoding>${project.build.sourceEncoding}</encoding>
     </configuration>
    </plugin>
    <plugin>
     <groupId>org.apache.maven.plugins</groupId>
     <artifactId>maven-source-plugin</artifactId>
-    <version>2.1.2</version>
+    <version>${maven-source-plugin.version}</version>
     <executions>
      <execution>
       <id>attach-sources</id>
@@ -122,7 +135,7 @@
    </plugin>
    <plugin>
     <artifactId>maven-invoker-plugin</artifactId>
-    <version>1.5</version>
+    <version>${maven-invoker-plugin.version}</version>
     <configuration>
      <settingsFile>src/it/settings.xml</settingsFile>
      <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
@@ -157,7 +170,7 @@
     <plugin>
      <groupId>org.eclipse.m2e</groupId>
      <artifactId>lifecycle-mapping</artifactId>
-     <version>1.0.0</version>
+     <version>${lifecycle-mapping.version}</version>
      <configuration>
       <lifecycleMappingMetadata>
        <pluginExecutions>
@@ -210,7 +223,7 @@
      <plugin>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-gpg-plugin</artifactId>
-      <version>1.1</version>
+      <version>${maven-gpg-plugin.version}</version>
       <executions>
        <execution>
         <id>sign-artifacts</id>
@@ -250,7 +263,7 @@
        <testSourceDirectory>${basedir}/src/test/scala</testSourceDirectory>
        <configLocation>${basedir}/build-tools/scalastyle_config.xml</configLocation>
        <outputFile>${project.build.directory}/scalastyle-output.xml</outputFile>
-       <outputEncoding>UTF-8</outputEncoding>
+       <outputEncoding>${project.build.sourceEncoding}</outputEncoding>
       </configuration>
       <executions>
        <execution>
