@@ -31,7 +31,6 @@
   <maven-invoker-plugin.version>3.2.0</maven-invoker-plugin.version>
   <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
   <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
-  <maven-pligin-api.version>3.6.1</maven-pligin-api.version>
   <maven-plugin-annotations.version>3.6.0</maven-plugin-annotations.version>
   <plexus-resources.version>1.1.0</plexus-resources.version>
   <maven-plugin-testing-harness.version>3.3.0</maven-plugin-testing-harness.version>
