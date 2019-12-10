@@ -88,7 +88,7 @@ public class ScalastyleViolationCheckMojo extends AbstractMojo {
      * This parameter is resolved as file, classpath resource then URL.
      * </p>
      * <p>
-     * Source directory config location is used if non is specified in configuration
+     * If test config is not specified, source directory config location is used.
      * </p>
      * <p/>
      */
