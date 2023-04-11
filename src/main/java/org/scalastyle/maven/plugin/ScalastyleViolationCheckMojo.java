@@ -56,7 +56,7 @@ import com.typesafe.config.ConfigFactory;
 /**
  * Entry point for scalastyle maven plugin.
  */
-@Mojo(name = "check", defaultPhase = LifecyclePhase.VERIFY, requiresProject = true, requiresDependencyResolution = ResolutionScope.TEST)
+@Mojo(name = "check", defaultPhase = LifecyclePhase.VERIFY, requiresProject = true, requiresDependencyResolution = ResolutionScope.NONE)
 public class ScalastyleViolationCheckMojo extends AbstractMojo {
 
     /**
